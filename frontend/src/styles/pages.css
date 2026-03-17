@@ -1,0 +1,169 @@
+/* =========================
+   GLOBAL PAGE STYLES
+========================= */
+
+.page-container,
+.auth-container {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background: radial-gradient(circle at top, #020617, #000000);
+  color: #f8fafc;
+  text-align: center;
+}
+
+/* Headings */
+.page-container h2,
+.auth-container h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #facc15;
+  margin-bottom: 10px;
+}
+
+.page-container p,
+.auth-container p {
+  color: #cbd5f5;
+  max-width: 600px;
+  margin-bottom: 30px;
+  font-size: 1rem;
+}
+
+/* =========================
+   FORMS
+========================= */
+
+form {
+  width: 100%;
+  max-width: 420px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(250, 204, 21, 0.05);
+}
+
+input,
+select {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  background: #020617;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  color: #f8fafc;
+  font-size: 0.95rem;
+}
+
+input::placeholder {
+  color: #94a3b8;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #facc15;
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #facc15, #eab308);
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #020617;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================
+   USER HOME CARDS
+========================= */
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 40px;
+}
+
+.action-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 30px;
+  border-radius: 16px;
+  color: #f8fafc;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.action-card:hover {
+  border-color: #facc15;
+  color: #facc15;
+  transform: translateY(-5px);
+}
+
+/* =========================
+   LIST / DATA VIEW
+========================= */
+
+.data-list {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  max-width: 500px;
+}
+
+.data-list li {
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  color: #e5e7eb;
+}
+
+/* =========================
+   NOTES & TEXT
+========================= */
+
+.note {
+  margin-top: 15px;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* =========================
+   NOMINEE PAGE
+========================= */
+
+.page-container button {
+  max-width: 320px;
+}
+
+/* =========================
+   MOBILE FRIENDLY
+========================= */
+
+@media (max-width: 576px) {
+  .page-container h2,
+  .auth-container h2 {
+    font-size: 1.8rem;
+  }
+
+  form {
+    padding: 24px;
+  }
+}
