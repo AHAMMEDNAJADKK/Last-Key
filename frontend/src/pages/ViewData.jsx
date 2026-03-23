@@ -1,69 +1,62 @@
-export default function ViewData() {
+import { useEffect, useState } from "react";
+import API from "../api";
 
-  const documents = [
-    {
-      name: "Aadhaar Card",
-      category: "Government ID",
-      icon: "🪪"
-    },
-    {
-      name: "Property Papers",
-      category: "Legal Document",
-      icon: "📄"
-    },
-    {
-      name: "Bank Documents",
-      category: "Financial",
-      icon: "🏦"
-    }
-  ];
+export default function ViewData() {
+  const [documents, setDocuments] = useState([]);
+
+  useEffect(() => {
+    fetchDocs();
+  }, []);
+
+  const fetchDocs = async () => {
+    const { data } = await API.get("/documents");
+    setDocuments(data);
+  };
+
+  const handleDelete = async (id) => {
+    await API.delete(`/documents/${id}`);
+    fetchDocs();
+  };
 
   return (
     <div className="container py-5">
 
-      {/* PAGE HEADER */}
-      <div className="text-center mb-5">
-        <h2>
-          Your <span className="gold">Secure Vault</span>
-        </h2>
-        <p className="text-muted">
-          View and manage the documents stored in your digital legacy vault.
-        </p>
-      </div>
+      <h2 className="text-center mb-5">
+        Your <span className="gold">Vault</span>
+      </h2>
 
       <div className="row g-4">
 
-        {documents.map((doc, index) => (
-          <div className="col-md-4" key={index}>
+        {documents.length === 0 ? (
+          <p className="text-center">No documents</p>
+        ) : (
+          documents.map((doc) => (
+            <div className="col-md-4" key={doc._id}>
+              <div className="glass-card p-4 text-center">
 
-            <div className="glass-card hover-card p-4 text-center">
+                <h5>{doc.name}</h5>
+                <p>{doc.category}</p>
 
-              <div className="card-icon mb-2">
-                {doc.icon}
-              </div>
+                <a
+                  href={`http://localhost:5000${doc.fileUrl}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-gold btn-sm"
+                >
+                  View
+                </a>
 
-              <h5>{doc.name}</h5>
-
-              <p className="text-muted">
-                {doc.category}
-              </p>
-
-              <div className="d-flex justify-content-center gap-2 mt-3">
-
-                <button className="btn btn-gold btn-sm">
-                  Download
-                </button>
-
-                <button className="btn btn-outline-danger btn-sm">
+                <button
+                  className="btn btn-danger btn-sm mt-2"
+                  onClick={() => handleDelete(doc._id)}
+                >
                   Delete
                 </button>
 
               </div>
-
             </div>
-
-          </div>
-        ))}
+          ))
+        )}
 
       </div>
 
