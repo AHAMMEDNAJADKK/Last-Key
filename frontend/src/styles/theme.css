@@ -257,3 +257,20 @@ body {
 .hover-card p{
   font-size:14px;
 }
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  transition: 0.3s;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+}
+
+.btn-gold {
+  background: gold;
+  border: none;
+  color: black;
+}

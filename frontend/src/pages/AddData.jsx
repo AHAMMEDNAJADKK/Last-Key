@@ -6,13 +6,13 @@ export default function AddData() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    name: "",
+    title: "",
     category: "Government ID",
-    description: "",
     file: null,
   });
 
   const [fileName, setFileName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -31,20 +31,22 @@ export default function AddData() {
     e.preventDefault();
 
     try {
-      const formData = new FormData();
+      setLoading(true);
 
-      formData.append("name", form.name);
+      const formData = new FormData();
+      formData.append("title", form.title); // ✅ FIXED
       formData.append("category", form.category);
-      formData.append("description", form.description);
       formData.append("file", form.file);
 
       await API.post("/documents", formData);
 
       alert("✅ Uploaded successfully");
-
       navigate("/user/view-data");
+
     } catch (error) {
       alert(error.response?.data?.message || "Upload failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,7 +66,7 @@ export default function AddData() {
 
               <input
                 type="text"
-                name="name"
+                name="title"
                 placeholder="Document Name"
                 className="form-control mb-3"
                 required
@@ -79,14 +81,8 @@ export default function AddData() {
                 <option>Government ID</option>
                 <option>Financial</option>
                 <option>Personal</option>
+                <option>Business</option>
               </select>
-
-              <textarea
-                name="description"
-                className="form-control mb-3"
-                placeholder="Description"
-                onChange={handleChange}
-              />
 
               <input
                 type="file"
@@ -98,7 +94,7 @@ export default function AddData() {
               {fileName && <p>Selected: {fileName}</p>}
 
               <button className="btn btn-gold w-100">
-                Upload
+                {loading ? "Uploading..." : "Upload"}
               </button>
 
             </form>

@@ -4,18 +4,26 @@ import API from "../api";
 export default function ViewData() {
   const [documents, setDocuments] = useState([]);
 
+  const fetchDocs = async () => {
+    try {
+      const { data } = await API.get("/documents");
+      setDocuments(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchDocs();
   }, []);
 
-  const fetchDocs = async () => {
-    const { data } = await API.get("/documents");
-    setDocuments(data);
-  };
-
   const handleDelete = async (id) => {
-    await API.delete(`/documents/${id}`);
-    fetchDocs();
+    try {
+      await API.delete(`/documents/${id}`);
+      fetchDocs();
+    } catch (error) {
+      alert("Delete failed");
+    }
   };
 
   return (
@@ -34,11 +42,13 @@ export default function ViewData() {
             <div className="col-md-4" key={doc._id}>
               <div className="glass-card p-4 text-center">
 
-                <h5>{doc.name}</h5>
+                {/* ✅ FIXED */}
+                <h5>{doc.title}</h5>
                 <p>{doc.category}</p>
 
+                {/* ✅ Cloudinary URL direct */}
                 <a
-                  href={`http://localhost:5000${doc.fileUrl}`}
+                  href={doc.fileUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-gold btn-sm"

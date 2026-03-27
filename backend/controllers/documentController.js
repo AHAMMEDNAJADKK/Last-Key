@@ -14,7 +14,7 @@ export const addDocument = async (req, res) => {
       name,
       category,
       description,
-      fileUrl: `/uploads/${req.file.filename}`,
+      fileUrl: req.file.path,
     });
 
     res.status(201).json(document);

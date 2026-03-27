@@ -18,5 +18,4 @@ const documentSchema = new mongoose.Schema({
   },
 
 }, { timestamps: true });
-
 export default mongoose.model("Document", documentSchema);
