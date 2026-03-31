@@ -3,7 +3,7 @@ import Document from "../models/Document.js";
 // ADD DOCUMENT
 export const addDocument = async (req, res) => {
   try {
-    const { name, category, description } = req.body;
+    const { title, category } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ message: "File required" });
@@ -11,7 +11,7 @@ export const addDocument = async (req, res) => {
 
     const document = await Document.create({
       user: req.user._id,
-      name,
+      title,
       category,
       description,
       fileUrl: req.file.path,

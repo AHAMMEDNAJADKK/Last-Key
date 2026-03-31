@@ -1,20 +1,24 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js"
 import documentRoutes from "./routes/documentRoutes.js"
 
+
 dotenv.config();
 
 const app = express();
 
-// middleware
+
+app.use((err, req, res, next) => {
+  res.status(500).json({ message: err.message });
+});
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth",authRoutes)
 app.use("/api/documents",documentRoutes);
+app.use("/uploads", express.static("uploads"));
 
 // connect DB
 connectDB();
