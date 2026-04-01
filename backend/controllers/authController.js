@@ -29,6 +29,7 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      // role will default to "user"
     });
 
     res.status(201).json({
@@ -36,6 +37,7 @@ export const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       token: generateToken(user._id),
+      role: user.role   // ✅ ADDED
     });
 
   } catch (error) {
@@ -56,6 +58,7 @@ export const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         token: generateToken(user._id),
+        role: user.role   // ✅ ADDED
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });
@@ -64,4 +67,9 @@ export const loginUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+// 🚪 LOGOUT
+export const logoutUser = (req, res) => {
+  res.json({ message: "Logged out successfully" });
 };

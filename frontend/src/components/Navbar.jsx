@@ -1,29 +1,43 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import API from "../api";
 
 export default function Navbar() {
   const navigate = useNavigate();
 
   const [role, setRole] = useState(localStorage.getItem("role"));
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
-  // 🔁 Update navbar when localStorage changes
+  // 🔁 Sync navbar when login/logout happens
   useEffect(() => {
-    const syncRole = () => {
+    const syncAuth = () => {
       setRole(localStorage.getItem("role"));
+      setToken(localStorage.getItem("token"));
     };
 
-    window.addEventListener("storage", syncRole);
+    window.addEventListener("storage", syncAuth);
 
     return () => {
-      window.removeEventListener("storage", syncRole);
+      window.removeEventListener("storage", syncAuth);
     };
   }, []);
 
-  // 🔓 LOGOUT FUNCTION
-  const handleLogout = () => {
-    localStorage.clear();
-    setRole(null);
-    navigate("/login");
+  // 🔓 LOGOUT FUNCTION (UPDATED)
+  const handleLogout = async () => {
+    try {
+      await API.post("/auth/logout"); // backend call (optional)
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("deathVerified");
+
+      setRole(null);
+      setToken(null);
+
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -118,7 +132,7 @@ export default function Navbar() {
             )}
 
             {/* ================= AUTH ================= */}
-            {!role ? (
+            {!token ? (
               <>
                 <li className="nav-item">
                   <NavLink to="/login" className="nav-link nav-modern">

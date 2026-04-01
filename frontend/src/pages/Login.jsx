@@ -24,7 +24,7 @@ export default function Login() {
       const { data } = await API.post("/auth/login", form);
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", "user");
+      localStorage.setItem("role", data.role);
 
       navigate("/user/home");
     } catch (error) {

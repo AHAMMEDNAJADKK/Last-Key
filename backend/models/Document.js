@@ -11,6 +11,13 @@ const documentSchema = new mongoose.Schema({
   category: String,
 
   fileUrl: String,
+  
+  publicId:{
+    type:String,
+    required:true,
+  },
+  
+  fileType: String,
 
   isEncrypted: {
     type: Boolean,
