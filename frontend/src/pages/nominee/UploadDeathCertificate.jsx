@@ -1,51 +1,69 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import API from "../../api";
 
 export default function UploadDeathCertificate() {
 
   const navigate = useNavigate();
-  const [fileName, setFileName] = useState("");
 
-  const handleUpload = (e) => {
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleUpload = async (e) => {
     e.preventDefault();
 
-    // FRONTEND DEMO SIMULATION
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("role", "nominee");
-    localStorage.setItem("deathVerified", "pending");
+    if (!file) {
+      alert("Please select a file");
+      return;
+    }
 
-    navigate("/nominee/pending");
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await API.post(
+        "/verification/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+
+      navigate("/nominee/pending");
+
+    } catch (error) {
+      alert(error.response?.data?.message || "Upload failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container py-5">
 
-      {/* HEADER */}
       <div className="text-center mb-4">
-
         <h2>
           Upload <span className="gold">Death Certificate</span>
         </h2>
 
         <p className="text-muted mx-auto" style={{ maxWidth: 700 }}>
-          To access the digital vault, nominees must submit a valid
-          government-issued death certificate. Our verification team
-          will review the document before granting any access.
+          Submit official proof for verification. Access is granted only after approval.
         </p>
-
       </div>
 
       <div className="row justify-content-center">
-
         <div className="col-md-6">
 
           <div className="glass-card hover-card p-4">
 
             <form onSubmit={handleUpload}>
 
-              {/* FILE INPUT */}
               <div className="mb-3">
-
                 <label className="form-label">
                   Upload Certificate
                 </label>
@@ -55,25 +73,16 @@ export default function UploadDeathCertificate() {
                   className="form-control"
                   accept=".pdf,.jpg,.png"
                   required
-                  onChange={(e) =>
-                    setFileName(e.target.files[0]?.name)
-                  }
+                  onChange={(e) => setFile(e.target.files[0])}
                 />
-
-                {fileName && (
-                  <p className="small text-muted mt-2">
-                    Selected: {fileName}
-                  </p>
-                )}
-
               </div>
 
-              {/* BUTTON */}
               <button
                 type="submit"
                 className="btn btn-gold w-100"
+                disabled={loading}
               >
-                Submit for Verification
+                {loading ? "Uploading..." : "Submit for Verification"}
               </button>
 
             </form>
@@ -81,7 +90,6 @@ export default function UploadDeathCertificate() {
           </div>
 
         </div>
-
       </div>
 
     </div>

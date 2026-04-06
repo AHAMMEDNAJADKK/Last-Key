@@ -1,26 +1,41 @@
 import { Navigate } from "react-router-dom";
+import useVerification from "../hooks/useVerification";
 
 export default function ProtectedRoute({ children, roleRequired }) {
+
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
-  const deathVerified = localStorage.getItem("deathVerified");
+
+  const status = useVerification(); // 🔥 NEW
+
   if (!token) {
-    return <Navigate to={role === "admin" ? "/admin/login" : "/login"} />;
+    return <Navigate to="/login" />;
   }
 
   if (roleRequired && role !== roleRequired) {
     return <Navigate to="/" />;
   }
 
-  // Nominee logic
+  // 🔐 NOMINEE FLOW
   if (role === "nominee") {
-    if (deathVerified === "false") {
+
+    if (status === "loading") {
+      return <p className="text-center mt-5">Loading...</p>;
+    }
+
+    if (status === "not_uploaded") {
       return <Navigate to="/nominee/upload-death-certificate" />;
     }
 
-    if (deathVerified === "pending") {
+    if (status === "pending") {
       return <Navigate to="/nominee/pending" />;
     }
+
+    if (status === "rejected") {
+      return <Navigate to="/nominee/rejected" />;
+    }
+
+    // ✅ approved → allow access
   }
 
   return children;

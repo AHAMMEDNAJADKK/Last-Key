@@ -1,19 +1,35 @@
 import { useState } from "react";
+import API from "../api";
 
 export default function SelectNominee() {
 
   const [nomineeName, setNomineeName] = useState("");
   const [nomineeEmail, setNomineeEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [relation, setRelation] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    alert("Nominee added successfully (frontend demo)");
+    try {
+      await API.post("/nominee", {
+        name: nomineeName,
+        email: nomineeEmail,
+        password,
+        relation,
+      });
 
-    setNomineeName("");
-    setNomineeEmail("");
-    setRelation("");
+      alert("Nominee added successfully ✅");
+
+      // reset form
+      setNomineeName("");
+      setNomineeEmail("");
+      setPassword("");
+      setRelation("");
+
+    } catch (error) {
+      alert(error.response?.data?.message || "Error adding nominee ❌");
+    }
   };
 
   return (
@@ -27,13 +43,11 @@ export default function SelectNominee() {
 
         <p className="text-muted mx-auto" style={{ maxWidth: 700 }}>
           A nominee is someone you trust who will receive access to your
-          digital vault after verification. You remain in full control of
-          what information they can access.
+          digital vault after verification.
         </p>
       </div>
 
       <div className="row justify-content-center">
-
         <div className="col-md-6">
 
           <div className="glass-card hover-card p-4">
@@ -42,10 +56,7 @@ export default function SelectNominee() {
 
               {/* NAME */}
               <div className="mb-3">
-                <label className="form-label">
-                  Nominee Name
-                </label>
-
+                <label className="form-label">Nominee Name</label>
                 <input
                   type="text"
                   className="form-control"
@@ -58,10 +69,7 @@ export default function SelectNominee() {
 
               {/* EMAIL */}
               <div className="mb-3">
-                <label className="form-label">
-                  Nominee Email
-                </label>
-
+                <label className="form-label">Nominee Email</label>
                 <input
                   type="email"
                   className="form-control"
@@ -72,12 +80,22 @@ export default function SelectNominee() {
                 />
               </div>
 
+              {/* 🔐 PASSWORD (NEW) */}
+              <div className="mb-3">
+                <label className="form-label">Nominee Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Set password for nominee"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
               {/* RELATION */}
               <div className="mb-3">
-                <label className="form-label">
-                  Relationship
-                </label>
-
+                <label className="form-label">Relationship</label>
                 <select
                   className="form-control"
                   value={relation}
@@ -97,10 +115,7 @@ export default function SelectNominee() {
               </div>
 
               {/* BUTTON */}
-              <button
-                type="submit"
-                className="btn btn-gold w-100"
-              >
+              <button type="submit" className="btn btn-gold w-100">
                 Save Nominee
               </button>
 
@@ -109,7 +124,6 @@ export default function SelectNominee() {
           </div>
 
         </div>
-
       </div>
 
     </div>

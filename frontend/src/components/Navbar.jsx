@@ -43,7 +43,6 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark glass-navbar fixed-top">
       <div className="container">
-
         {/* LOGO */}
         <NavLink className="navbar-brand logo-text fw-bold" to="/">
           LastKey
@@ -62,26 +61,35 @@ export default function Navbar() {
         {/* MENU */}
         <div className="collapse navbar-collapse" id="lastKeyNavbar">
           <ul className="navbar-nav ms-auto align-items-lg-center">
-
             {/* PUBLIC */}
             <li className="nav-item">
-              <NavLink to="/" className="nav-link nav-modern">Home</NavLink>
+              <NavLink to="/" className="nav-link nav-modern">
+                Home
+              </NavLink>
             </li>
 
             <li className="nav-item">
-              <NavLink to="/about" className="nav-link nav-modern">About</NavLink>
+              <NavLink to="/about" className="nav-link nav-modern">
+                About
+              </NavLink>
             </li>
 
             <li className="nav-item">
-              <NavLink to="/how" className="nav-link nav-modern">How It Works</NavLink>
+              <NavLink to="/how" className="nav-link nav-modern">
+                How It Works
+              </NavLink>
             </li>
 
             <li className="nav-item">
-              <NavLink to="/security" className="nav-link nav-modern">Security</NavLink>
+              <NavLink to="/security" className="nav-link nav-modern">
+                Security
+              </NavLink>
             </li>
 
             <li className="nav-item">
-              <NavLink to="/contact" className="nav-link nav-modern">Contact</NavLink>
+              <NavLink to="/contact" className="nav-link nav-modern">
+                Contact
+              </NavLink>
             </li>
 
             {/* ================= USER ================= */}
@@ -100,7 +108,10 @@ export default function Navbar() {
                 </li>
 
                 <li className="nav-item">
-                  <NavLink to="/user/select-nominee" className="nav-link nav-modern">
+                  <NavLink
+                    to="/user/select-nominee"
+                    className="nav-link nav-modern"
+                  >
                     Nominee
                   </NavLink>
                 </li>
@@ -108,6 +119,12 @@ export default function Navbar() {
                 <li className="nav-item">
                   <NavLink to="/user/view-data" className="nav-link nav-modern">
                     View Data
+                  </NavLink>
+                </li>
+
+                <li className="nav-item">
+                  <NavLink to="/user/nominees" className="nav-link nav-modern">
+                    Nominees
                   </NavLink>
                 </li>
               </>
@@ -148,12 +165,14 @@ export default function Navbar() {
               </>
             ) : (
               <li className="nav-item ms-lg-3">
-                <button onClick={handleLogout} className="btn btn-outline-warning">
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-outline-warning"
+                >
                   Logout
                 </button>
               </li>
             )}
-
           </ul>
         </div>
       </div>

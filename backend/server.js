@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js"
 import documentRoutes from "./routes/documentRoutes.js"
+import nomineeRoutes from "./routes/nomineeRoutes.js"
+import verificationRoutes from "./routes/verificationRoutes.js"
 
 
 dotenv.config();
@@ -19,6 +21,8 @@ app.use(express.json());
 app.use("/api/auth",authRoutes)
 app.use("/api/documents",documentRoutes);
 app.use("/uploads", express.static("uploads"));
+app.use("/api/nominee",nomineeRoutes);
+app.use("/api/verification",verificationRoutes)
 
 // connect DB
 connectDB();
