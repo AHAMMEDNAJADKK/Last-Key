@@ -1,40 +1,69 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Nominee from "../models/Nominee.js";
 
+// ================= USER PROTECT =================
 export const protect = async (req, res, next) => {
-  let token;
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
 
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      req.user = await User.findById(decoded.id).select("-password");
-
-      next();
-    } catch (error) {
-      res.status(401).json({ message: "Not authorized" });
+    if (!token) {
+      return res.status(401).json({ message: "No token" });
     }
-  }
 
-  if (!token) {
-    res.status(401).json({ message: "No token" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = await User.findById(decoded.id).select("-password");
+
+    next();
+
+  } catch (error) {
+    res.status(401).json({ message: "Not authorized" });
   }
 };
 
-export const protectAdmin = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
+// ================= NOMINEE PROTECT =================
+export const protectNominee = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "No token" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const nominee = await Nominee.findById(decoded.id);
+
+    if (!nominee) {
+      return res.status(401).json({ message: "Not nominee" });
+    }
+
+    req.user = nominee;
     next();
-  } else {
-    res.status(403).json({ message: "Admin access only" });
+
+  } catch (error) {
+    res.status(401).json({ message: "Not authorized" });
   }
 };
 
-export const protectNominee = (req, res, next) => {
-  if (req.user && req.user.role === "nominee") {
+// ================= ADMIN PROTECT =================
+export const protectAdmin = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id);
+
+    if (user.role !== "admin") {
+      return res.status(403).json({ message: "Admin only" });
+    }
+
+    req.user = user;
     next();
-  } else {
-    res.status(403).json({ message: "Nominee access only" });
+
+  } catch (error) {
+    res.status(401).json({ message: "Not authorized" });
   }
 };

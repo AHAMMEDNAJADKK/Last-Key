@@ -13,9 +13,6 @@ dotenv.config();
 const app = express();
 
 
-app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message });
-});
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth",authRoutes)
@@ -24,6 +21,10 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/nominee",nomineeRoutes);
 app.use("/api/verification",verificationRoutes)
 
+
+app.use((err, req, res, next) => {
+  res.status(500).json({ message: err.message });
+});
 // connect DB
 connectDB();
 

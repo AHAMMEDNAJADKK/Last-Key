@@ -3,7 +3,7 @@ import { addNominee, getNominees } from "../controllers/nomineeController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { nomineeLogin } from "../controllers/nomineeController.js";
 import { uploadDeathCertificate,getNomineeDocuments } from "../controllers/nomineeController.js";
-import upload from "../middleware/uploadMiddleware.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 

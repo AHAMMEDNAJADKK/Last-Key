@@ -6,7 +6,7 @@ import {
 } from "../controllers/documentController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
-import upload from "../middleware/uploadMiddleware.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 

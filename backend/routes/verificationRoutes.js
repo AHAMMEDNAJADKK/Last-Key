@@ -1,11 +1,21 @@
 import express from "express";
-import { uploadCertificate } from "../controllers/verificationController.js";
-import { protectNominee } from "../middleware/authMiddleware.js";
-import { getAllVerifications,updateVerificationStatus,getMyVerificationStatus } from "../controllers/verificationController.js";
-import {protectAdmin} from "../middleware/authMiddleware.js"
+import upload from "../middleware/upload.js";
+
+import {
+  uploadCertificate,
+  getMyVerificationStatus,
+  getAllVerifications,
+  updateVerificationStatus,
+} from "../controllers/verificationController.js";
+
+import {
+  protectNominee,
+  protectAdmin,
+} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+// nominee
 router.post(
   "/upload",
   protectNominee,
@@ -13,7 +23,10 @@ router.post(
   uploadCertificate
 );
 
-router.get("/admin",protectAdmin,getAllVerifications)
-router.put("/admin/:id",protectAdmin,updateVerificationStatus);
-router.get("/status",protectNominee,getMyVerificationStatus);
+router.get("/status", protectNominee, getMyVerificationStatus);
+
+// admin
+router.get("/all", protectAdmin, getAllVerifications);
+router.put("/update/:id", protectAdmin, updateVerificationStatus);
+
 export default router;

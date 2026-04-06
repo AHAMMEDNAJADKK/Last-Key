@@ -2,6 +2,7 @@ import Verification from "../models/Verification.js";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
 
+// ================= UPLOAD CERTIFICATE =================
 export const uploadCertificate = async (req, res) => {
   try {
     if (!req.file) {
@@ -10,10 +11,10 @@ export const uploadCertificate = async (req, res) => {
 
     const filePath = req.file.path;
 
-    // upload to cloudinary
+    // ☁️ upload to cloudinary
     const result = await cloudinary.uploader.upload(filePath);
 
-    // save in DB
+    // 💾 save in DB
     const verification = await Verification.create({
       nominee: req.user._id,
       certificateUrl: result.secure_url,
@@ -21,50 +22,13 @@ export const uploadCertificate = async (req, res) => {
       status: "pending",
     });
 
-    // delete local file
+    // 🧹 delete local file
     fs.unlinkSync(filePath);
 
     res.status(201).json({
       message: "Uploaded successfully",
       status: verification.status,
     });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// ================= GET ALL (ADMIN) =================
-export const getAllVerifications = async (req, res) => {
-  try {
-    const verifications = await Verification.find()
-      .populate("nominee", "name email")
-      .sort({ createdAt: -1 });
-
-    res.json(verifications);
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};  
-
-
-
-// ================= UPDATE STATUS =================
-export const updateVerificationStatus = async (req, res) => {
-  try {
-    const { status } = req.body; // approved / rejected
-
-    const verification = await Verification.findById(req.params.id);
-
-    if (!verification) {
-      return res.status(404).json({ message: "Not found" });
-    }
-
-    verification.status = status;
-    await verification.save();
-
-    res.json({ message: `Verification ${status}` });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -85,6 +49,44 @@ export const getMyVerificationStatus = async (req, res) => {
     res.json({
       status: verification.status,
       certificateUrl: verification.certificateUrl,
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ================= ADMIN GET ALL =================
+export const getAllVerifications = async (req, res) => {
+  try {
+    const verifications = await Verification.find()
+      .populate("nominee", "name email")
+      .sort({ createdAt: -1 });
+
+    res.json(verifications);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ================= ADMIN UPDATE =================
+export const updateVerificationStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const verification = await Verification.findById(req.params.id);
+
+    if (!verification) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    verification.status = status;
+    await verification.save();
+
+    res.json({
+      message: `Verification ${status}`,
+      status,
     });
 
   } catch (error) {
