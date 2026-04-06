@@ -25,6 +25,7 @@ app.use("/api/verification",verificationRoutes)
 app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message });
 });
+
 // connect DB
 connectDB();
 

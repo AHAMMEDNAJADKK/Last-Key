@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ use context
 
   const [form, setForm] = useState({
     email: "",
@@ -23,8 +25,14 @@ export default function Login() {
     try {
       const { data } = await API.post("/auth/login", form);
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+      // ✅ USE CONTEXT (not localStorage directly)
+      login({
+        token: data.token,
+        user: {
+          role: data.role,
+          email: data.email,
+        },
+      });
 
       navigate("/user/home");
     } catch (error) {

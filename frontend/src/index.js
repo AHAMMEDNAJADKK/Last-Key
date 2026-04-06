@@ -5,7 +5,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/theme.css';
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/pages.css";
+import { AuthProvider } from './context/AuthContext';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+root.render(
+    <AuthProvider>
+<App />
+</AuthProvider>
+);

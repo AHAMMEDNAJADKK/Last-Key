@@ -2,11 +2,18 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// 🔐 GENERATE TOKEN
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
-  });
+// 🔐 GENERATE TOKEN WITH ROLE
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "7d",
+    }
+  );
 };
 
 // 📝 REGISTER
@@ -14,30 +21,26 @@ export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // check user
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // create user
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      // role will default to "user"
     });
 
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id),
-      role: user.role   // ✅ ADDED
+      role: user.role,
+      token: generateToken(user), // ✅ FIXED
     });
 
   } catch (error) {
@@ -57,8 +60,8 @@ export const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        token: generateToken(user._id),
-        role: user.role   // ✅ ADDED
+        role: user.role,
+        token: generateToken(user), // ✅ FIXED
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });

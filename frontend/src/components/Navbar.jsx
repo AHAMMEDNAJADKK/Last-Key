@@ -1,39 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import API from "../api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
 
-  const [role, setRole] = useState(localStorage.getItem("role"));
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const { user, logout } = useAuth(); // ✅ single source of truth
 
-  // 🔁 Sync navbar when login/logout happens
-  useEffect(() => {
-    const syncAuth = () => {
-      setRole(localStorage.getItem("role"));
-      setToken(localStorage.getItem("token"));
-    };
-
-    window.addEventListener("storage", syncAuth);
-
-    return () => {
-      window.removeEventListener("storage", syncAuth);
-    };
-  }, []);
-
-  // 🔓 LOGOUT FUNCTION (UPDATED)
   const handleLogout = async () => {
     try {
-      await API.post("/auth/logout"); // backend call (optional)
-
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("deathVerified");
-
-      setRole(null);
-      setToken(null);
-
+      logout(); // ✅ clears everything (state + localStorage)
       navigate("/login");
     } catch (error) {
       console.log(error);
@@ -61,39 +36,30 @@ export default function Navbar() {
         {/* MENU */}
         <div className="collapse navbar-collapse" id="lastKeyNavbar">
           <ul className="navbar-nav ms-auto align-items-lg-center">
+
             {/* PUBLIC */}
             <li className="nav-item">
-              <NavLink to="/" className="nav-link nav-modern">
-                Home
-              </NavLink>
+              <NavLink to="/" className="nav-link nav-modern">Home</NavLink>
             </li>
 
             <li className="nav-item">
-              <NavLink to="/about" className="nav-link nav-modern">
-                About
-              </NavLink>
+              <NavLink to="/about" className="nav-link nav-modern">About</NavLink>
             </li>
 
             <li className="nav-item">
-              <NavLink to="/how" className="nav-link nav-modern">
-                How It Works
-              </NavLink>
+              <NavLink to="/how" className="nav-link nav-modern">How It Works</NavLink>
             </li>
 
             <li className="nav-item">
-              <NavLink to="/security" className="nav-link nav-modern">
-                Security
-              </NavLink>
+              <NavLink to="/security" className="nav-link nav-modern">Security</NavLink>
             </li>
 
             <li className="nav-item">
-              <NavLink to="/contact" className="nav-link nav-modern">
-                Contact
-              </NavLink>
+              <NavLink to="/contact" className="nav-link nav-modern">Contact</NavLink>
             </li>
 
             {/* ================= USER ================= */}
-            {role === "user" && (
+            {user?.role === "user" && (
               <>
                 <li className="nav-item">
                   <NavLink to="/user/home" className="nav-link nav-modern">
@@ -108,10 +74,7 @@ export default function Navbar() {
                 </li>
 
                 <li className="nav-item">
-                  <NavLink
-                    to="/user/select-nominee"
-                    className="nav-link nav-modern"
-                  >
+                  <NavLink to="/user/select-nominee" className="nav-link nav-modern">
                     Nominee
                   </NavLink>
                 </li>
@@ -131,7 +94,7 @@ export default function Navbar() {
             )}
 
             {/* ================= NOMINEE ================= */}
-            {role === "nominee" && (
+            {user?.role === "nominee" && (
               <li className="nav-item">
                 <NavLink to="/nominee/access" className="nav-link nav-modern">
                   My Access
@@ -140,7 +103,7 @@ export default function Navbar() {
             )}
 
             {/* ================= ADMIN ================= */}
-            {role === "admin" && (
+            {user?.role === "admin" && (
               <li className="nav-item">
                 <NavLink to="/admin/dashboard" className="nav-link nav-modern">
                   Admin Panel
@@ -149,7 +112,7 @@ export default function Navbar() {
             )}
 
             {/* ================= AUTH ================= */}
-            {!token ? (
+            {!user ? (
               <>
                 <li className="nav-item">
                   <NavLink to="/login" className="nav-link nav-modern">
@@ -165,14 +128,12 @@ export default function Navbar() {
               </>
             ) : (
               <li className="nav-item ms-lg-3">
-                <button
-                  onClick={handleLogout}
-                  className="btn btn-outline-warning"
-                >
+                <button onClick={handleLogout} className="btn btn-outline-warning">
                   Logout
                 </button>
               </li>
             )}
+
           </ul>
         </div>
       </div>

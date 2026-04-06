@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Nominee from "../models/Nominee.js";
 
-// ================= USER PROTECT =================
+// ================= GENERIC PROTECT =================
 export const protect = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -13,7 +13,15 @@ export const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = await User.findById(decoded.id).select("-password");
+    // ✅ Attach user (from DB)
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    req.user = user;
+    req.role = decoded.role; // ✅ from token
 
     next();
 
@@ -40,6 +48,8 @@ export const protectNominee = async (req, res, next) => {
     }
 
     req.user = nominee;
+    req.role = "nominee";
+
     next();
 
   } catch (error) {
@@ -47,23 +57,14 @@ export const protectNominee = async (req, res, next) => {
   }
 };
 
-// ================= ADMIN PROTECT =================
-export const protectAdmin = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
+// ================= ROLE CHECK (🔥 IMPORTANT) =================
+export const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const user = await User.findById(decoded.id);
-
-    if (user.role !== "admin") {
-      return res.status(403).json({ message: "Admin only" });
+    if (!roles.includes(req.role)) {
+      return res.status(403).json({ message: "Access denied" });
     }
 
-    req.user = user;
     next();
-
-  } catch (error) {
-    res.status(401).json({ message: "Not authorized" });
-  }
+  };
 };
