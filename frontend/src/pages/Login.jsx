@@ -1,79 +1,74 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import API from "../api";
 
 export default function Login() {
-
-  const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // COMMON LOGIN FLAG
-    localStorage.setItem("isLoggedIn", "true");
+    try {
+      const { data } = await API.post("/auth/login", form);
 
-    // ROLE LOGIC
-    if (email.toLowerCase().includes("nominee")) {
-
-      localStorage.setItem("role", "nominee");
-      localStorage.setItem("deathVerified", "false");
-
-      navigate("/nominee/upload-death-certificate");
-
-    } else {
-
-      localStorage.setItem("role", "user");
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
 
       navigate("/user/home");
-
+    } catch (error) {
+      alert(error.response?.data?.message || "Invalid credentials");
     }
   };
 
   return (
     <div className="container py-5">
-
       <div className="row justify-content-center">
-
         <div className="col-md-5">
-
           <div className="glass-card hover-card p-5">
-
             <h2 className="text-center mb-4">
               Login to <span className="gold">LastKey</span>
             </h2>
 
             <form onSubmit={handleLogin}>
-
               <div className="mb-3">
                 <label className="form-label">Email</label>
-
                 <input
                   type="email"
+                  name="email"
                   className="form-control"
                   placeholder="Enter your email"
                   required
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleChange}
                 />
               </div>
 
               <div className="mb-3">
                 <label className="form-label">Password</label>
-
                 <input
                   type="password"
+                  name="password"
                   className="form-control"
                   placeholder="Enter your password"
                   required
+                  onChange={handleChange}
                 />
               </div>
 
-              <button
-                type="submit"
-                className="btn btn-gold w-100 mt-2"
-              >
+              <button type="submit" className="btn btn-gold w-100 mt-2">
                 Login
               </button>
-
             </form>
 
             <p className="text-center mt-4 text-muted">
@@ -82,13 +77,9 @@ export default function Login() {
                 Register
               </Link>
             </p>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }

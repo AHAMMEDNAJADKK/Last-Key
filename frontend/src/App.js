@@ -25,7 +25,7 @@ import NomineeAccess from "./pages/nominee/NomineeAccess";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-
+import ViewNominees from "./pages/ViewNominees";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
@@ -34,7 +34,6 @@ function App() {
       <Navbar />
 
       <Routes>
-
         {/* PUBLIC */}
         <Route path="/user" element={<DashboardLayout />}></Route>
         <Route path="/" element={<Home />} />
@@ -125,7 +124,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/user/nominees"
+          element={
+            <ProtectedRoute roleRequired="user">
+              <ViewNominees />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       <Footer />

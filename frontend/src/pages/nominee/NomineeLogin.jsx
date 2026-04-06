@@ -1,39 +1,55 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../../api";
 
 export default function NomineeLogin() {
 
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // FRONTEND DEMO LOGIN
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("role", "nominee");
-    localStorage.setItem("deathVerified", "false");
+    try {
+      const { data } = await API.post("/nominees/login", form);
 
-    navigate("/nominee/upload-death-certificate");
+      // ✅ REAL LOGIN
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("deathVerified", "false");
+
+      navigate("/nominee/upload-death-certificate");
+
+    } catch (error) {
+      alert(error.response?.data?.message || "Login failed");
+    }
   };
 
   return (
     <div className="container py-5">
 
-      {/* HEADER */}
       <div className="text-center mb-4">
-
         <h2>
           Nominee <span className="gold">Access Login</span>
         </h2>
 
         <p className="text-muted mx-auto" style={{ maxWidth: 650 }}>
-          Nominees can securely access the digital vault once identity
-          verification and document approval are completed.
+          Login securely to access vault after verification.
         </p>
-
       </div>
 
       <div className="row justify-content-center">
-
         <div className="col-md-5">
 
           <div className="glass-card hover-card p-4">
@@ -42,41 +58,29 @@ export default function NomineeLogin() {
 
               {/* EMAIL */}
               <div className="mb-3">
-
-                <label className="form-label">
-                  Email Address
-                </label>
-
                 <input
                   type="email"
+                  name="email"
                   className="form-control"
                   placeholder="Enter nominee email"
+                  onChange={handleChange}
                   required
                 />
-
               </div>
 
               {/* PASSWORD */}
               <div className="mb-3">
-
-                <label className="form-label">
-                  Password
-                </label>
-
                 <input
                   type="password"
+                  name="password"
                   className="form-control"
                   placeholder="Enter password"
+                  onChange={handleChange}
                   required
                 />
-
               </div>
 
-              {/* BUTTON */}
-              <button
-                type="submit"
-                className="btn btn-gold w-100 mt-2"
-              >
+              <button className="btn btn-gold w-100 mt-2">
                 Login Securely
               </button>
 
@@ -85,7 +89,6 @@ export default function NomineeLogin() {
           </div>
 
         </div>
-
       </div>
 
     </div>

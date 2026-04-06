@@ -11,6 +11,13 @@ const documentSchema = new mongoose.Schema({
   category: String,
 
   fileUrl: String,
+  
+  publicId:{
+    type:String,
+    required:true,
+  },
+  
+  fileType: String,
 
   isEncrypted: {
     type: Boolean,
@@ -18,5 +25,4 @@ const documentSchema = new mongoose.Schema({
   },
 
 }, { timestamps: true });
-
 export default mongoose.model("Document", documentSchema);

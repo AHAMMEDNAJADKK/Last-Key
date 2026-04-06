@@ -22,3 +22,19 @@ export const protect = async (req, res, next) => {
     res.status(401).json({ message: "No token" });
   }
 };
+
+export const protectAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    next();
+  } else {
+    res.status(403).json({ message: "Admin access only" });
+  }
+};
+
+export const protectNominee = (req, res, next) => {
+  if (req.user && req.user.role === "nominee") {
+    next();
+  } else {
+    res.status(403).json({ message: "Nominee access only" });
+  }
+};

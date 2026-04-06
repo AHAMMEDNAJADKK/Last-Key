@@ -1,23 +1,37 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import API from "../../api";
 
 export default function AdminDashboard() {
 
-  const navigate = useNavigate();
+  const [verifications, setVerifications] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // DEMO DATA
-  const nomineeRequest = {
-    nomineeName: "Rahul Kumar",
-    userName: "Ahamed Najad",
-    document: "death_certificate.pdf"
+  // 🔄 FETCH DATA
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const { data } = await API.get("/verification/admin");
+      setVerifications(data);
+    } catch (error) {
+      console.log(error);
+      alert("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const approveAccess = () => {
-    alert("Access Approved");
-    navigate("/nominee/access");
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const rejectAccess = () => {
-    alert("Access Rejected");
+  // ✅ APPROVE / REJECT
+  const handleUpdate = async (id, status) => {
+    try {
+      await API.put(`/verification/admin/${id}`, { status });
+      fetchData(); // refresh
+    } catch (error) {
+      alert("Update failed");
+    }
   };
 
   return (
@@ -25,7 +39,6 @@ export default function AdminDashboard() {
 
       {/* HEADER */}
       <div className="mb-5 text-center">
-
         <h2>
           Admin <span className="gold">Verification Panel</span>
         </h2>
@@ -33,61 +46,75 @@ export default function AdminDashboard() {
         <p className="text-muted">
           Review nominee verification requests before granting vault access.
         </p>
-
       </div>
 
-      <div className="row justify-content-center">
+      <div className="row g-4">
 
-        <div className="col-md-6">
+        {loading ? (
+          <p className="text-center">Loading...</p>
+        ) : verifications.length === 0 ? (
+          <p className="text-center">No verification requests</p>
+        ) : (
+          verifications.map((item) => (
+            <div className="col-md-4" key={item._id}>
 
-          <div className="glass-card hover-card p-4">
+              <div className="glass-card hover-card p-4 text-center">
 
-            {/* ICON */}
-            <div className="card-icon mb-3 text-center">
-              📄
+                {/* ICON */}
+                <div className="card-icon mb-3">
+                  📄
+                </div>
+
+                <h5 className="mb-2">
+                  {item.nominee?.name}
+                </h5>
+
+                <p className="mb-1">
+                  {item.nominee?.email}
+                </p>
+
+                <p className="mb-2">
+                  Status: <b>{item.status}</b>
+                </p>
+
+                {/* VIEW FILE */}
+                <a
+                  href={item.certificateUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-gold btn-sm w-100"
+                >
+                  View Certificate
+                </a>
+
+                {/* ACTION BUTTONS */}
+                {item.status === "pending" && (
+                  <>
+                    <button
+                      className="btn btn-success btn-sm mt-2 w-100"
+                      onClick={() =>
+                        handleUpdate(item._id, "approved")
+                      }
+                    >
+                      Approve
+                    </button>
+
+                    <button
+                      className="btn btn-danger btn-sm mt-2 w-100"
+                      onClick={() =>
+                        handleUpdate(item._id, "rejected")
+                      }
+                    >
+                      Reject
+                    </button>
+                  </>
+                )}
+
+              </div>
+
             </div>
-
-            <h5 className="text-center mb-3">
-              Death Certificate Verification
-            </h5>
-
-            <p className="mb-1">
-              <strong>Nominee:</strong> {nomineeRequest.nomineeName}
-            </p>
-
-            <p className="mb-1">
-              <strong>User Account:</strong> {nomineeRequest.userName}
-            </p>
-
-            <p className="mb-3">
-              <strong>Document:</strong>{" "}
-              <span className="text-info">
-                {nomineeRequest.document}
-              </span>
-            </p>
-
-            {/* ACTION BUTTONS */}
-            <div className="d-flex gap-2">
-
-              <button
-                className="btn btn-success w-50"
-                onClick={approveAccess}
-              >
-                Approve
-              </button>
-
-              <button
-                className="btn btn-danger w-50"
-                onClick={rejectAccess}
-              >
-                Reject
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
+          ))
+        )}
 
       </div>
 
