@@ -76,3 +76,22 @@ export const loginUser = async (req, res) => {
 export const logoutUser = (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
+
+// 👤 GET ME (for frontend persistence)
+export const getMe = async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: req.role,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

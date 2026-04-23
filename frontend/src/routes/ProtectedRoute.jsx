@@ -4,10 +4,14 @@ import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({ children, roleRequired }) {
 
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
 
   const status = useVerification(); // ✅ always called (safe)
+
+  if (loading) {
+    return <p className="text-center mt-5">Loading...</p>;
+  }
 
   // ❌ No user
   if (!user) {

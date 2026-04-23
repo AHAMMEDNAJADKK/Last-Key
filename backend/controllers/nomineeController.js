@@ -1,11 +1,13 @@
 import Nominee from "../models/Nominee.js";
+import Document from "../models/Document.js";
+import Verification from "../models/Verification.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
 // 🔐 GENERATE TOKEN
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id, role: "nominee" }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
@@ -82,43 +84,8 @@ export const nomineeLogin = async (req, res) => {
   }
 };
 
-// ================= UPLOAD DEATH CERTIFICATE =================
-export const uploadDeathCertificate = async (req, res) => {
-  try {
-    const nomineeId = req.user._id;
-
-    if (!req.file) {
-      return res.status(400).json({ message: "File required" });
-    }
-
-    // upload to cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path);
-
-    const nominee = await Nominee.findByIdAndUpdate(
-      nomineeId,
-      {
-        deathCertificate: result.secure_url,
-        verificationStatus: "pending",
-      },
-      { new: true }
-    );
-
-    // delete local file
-    fs.unlinkSync(req.file.path);
-
-    res.json({
-      message: "Certificate uploaded, waiting for admin approval",
-      nominee,
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 export const getNomineeDocuments = async (req, res) => {
   try {
-    // nominee login user
     const nominee = req.user;
 
     if (nominee.role !== "nominee") {
@@ -126,11 +93,13 @@ export const getNomineeDocuments = async (req, res) => {
     }
 
     // check verification
-    if (nominee.verificationStatus !== "approved") {
+    const verification = await Verification.findOne({ nominee: nominee._id });
+    if (!verification || verification.status !== "approved") {
       return res.status(403).json({
         message: "Access not approved yet",
       });
     }
+
     // get documents of linked user
     const documents = await Document.find({
       user: nominee.user,

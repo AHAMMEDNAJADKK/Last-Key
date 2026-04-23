@@ -10,7 +10,7 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data } = await API.get("/verification/admin");
+      const { data } = await API.get("/verification/all");
       setVerifications(data);
     } catch (error) {
       console.log(error);
@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   // ✅ APPROVE / REJECT
   const handleUpdate = async (id, status) => {
     try {
-      await API.put(`/verification/admin/${id}`, { status });
+      await API.put(`/verification/update/${id}`, { status });
       fetchData(); // refresh
     } catch (error) {
       alert("Update failed");

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../api";
+import { useAuth } from "../../context/AuthContext";
 
 export default function NomineeLogin() {
 
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [form, setForm] = useState({
     email: "",
@@ -25,9 +27,7 @@ export default function NomineeLogin() {
       const { data } = await API.post("/nominees/login", form);
 
       // ✅ REAL LOGIN
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("deathVerified", "false");
+      login(data);
 
       navigate("/nominee/upload-death-certificate");
 

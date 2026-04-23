@@ -31,18 +31,6 @@ const nomineeSchema = new mongoose.Schema(
       required: true,
     },
     deathCertificate: String,
-    verificationStatus: {
-      type: String,
-      enum: ["none", "pending", "approved", "rejected"],
-      default: "none",
-    },
-
-    // 🔐 Verification status
-    isVerified: {
-      type: String,
-      enum: ["false", "pending", "approved"],
-      default: "false",
-    },
   },
   { timestamps: true },
 );

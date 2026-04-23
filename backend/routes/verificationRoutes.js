@@ -1,5 +1,5 @@
 import express from "express";
-import upload from "../middleware/upload.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 import {
   uploadCertificate,
@@ -9,8 +9,9 @@ import {
 } from "../controllers/verificationController.js";
 
 import {
+  protect,
   protectNominee,
-  protectAdmin,
+  authorizeRoles,
 } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -26,7 +27,13 @@ router.post(
 router.get("/status", protectNominee, getMyVerificationStatus);
 
 // admin
-router.get("/all", protectAdmin, getAllVerifications);
-router.put("/update/:id", protectAdmin, updateVerificationStatus);
+router.get("/all", protect, authorizeRoles("admin"), getAllVerifications);
+
+router.put(
+  "/update/:id",
+  protect,
+  authorizeRoles("admin"),
+  updateVerificationStatus
+);
 
 export default router;

@@ -1,34 +1,47 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import API from "../api";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // 🔁 Load from localStorage (on refresh)
+  // 🔁 Check Auth from backend
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
+    const checkAuth = async () => {
+      const storedToken = localStorage.getItem("token");
+      if (storedToken) {
+        try {
+          // Set token so API interceptor can use it
+          setToken(storedToken);
+          
+          const { data } = await API.get("/auth/me");
+          setUser(data);
+        } catch (error) {
+          console.error("Auth check failed", error);
+          localStorage.removeItem("token");
+          setToken(null);
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
 
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
-    }
+    checkAuth();
   }, []);
 
   // ✅ LOGIN
   const login = (data) => {
     localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-
-    setUser(data.user);
+    setUser(data.user || data); // handle variations in login responses
     setToken(data.token);
   };
 
   // ✅ LOGOUT
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
     setUser(null);
     setToken(null);
   };
@@ -38,12 +51,13 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         token,
+        loading,
         role: user?.role, // 🔥 central role
         login,
         logout,
       }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

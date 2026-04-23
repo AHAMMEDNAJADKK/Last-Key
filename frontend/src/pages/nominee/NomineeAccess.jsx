@@ -8,7 +8,7 @@ export default function NomineeAccess() {
   // 📡 FETCH DOCUMENTS FROM BACKEND
   const fetchDocs = async () => {
     try {
-      const { data } = await API.get("/nominee/documents");
+      const { data } = await API.get("/nominees/documents");
       setDocuments(data);
     } catch (error) {
       alert(error.response?.data?.message || "Access denied");

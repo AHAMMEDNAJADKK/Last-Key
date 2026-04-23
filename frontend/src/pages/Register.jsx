@@ -1,9 +1,11 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import API from "../api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [form, setForm] = useState({
     name: "",
@@ -24,8 +26,13 @@ export default function Register() {
     try {
       const { data } = await API.post("/auth/register", form);
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+      login({
+        token: data.token,
+        user: {
+          role: data.role,
+          email: data.email,
+        },
+      });
 
       navigate("/user/home");
     } catch (error) {

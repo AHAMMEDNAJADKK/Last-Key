@@ -13,15 +13,19 @@ export const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // ✅ Attach user (from DB)
-    const user = await User.findById(decoded.id).select("-password");
+    let user;
+    if (decoded.role === "nominee") {
+      user = await Nominee.findById(decoded.id).select("-password");
+    } else {
+      user = await User.findById(decoded.id).select("-password");
+    }
 
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
 
     req.user = user;
-    req.role = decoded.role; // ✅ from token
+    req.role = decoded.role || user.role; // ✅ from token or DB
 
     next();
 

@@ -1,35 +1,50 @@
 import axios from "axios";
 
+// ✅ CREATE AXIOS INSTANCE
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: (import.meta.env.VITE_API_URL || "http://localhost:5000") + "/api",
+  withCredentials: true, // optional (good for auth/cookies later)
 });
 
-// ✅ REQUEST INTERCEPTOR (attach token)
-API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
+// ==============================
+// ✅ REQUEST INTERCEPTOR
+// ==============================
+API.interceptors.request.use(
+  (req) => {
+    const token = localStorage.getItem("token");
 
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
+    if (token) {
+      req.headers.Authorization = `Bearer ${token}`;
+    }
 
-  return req;
-});
+    return req;
+  },
+  (error) => Promise.reject(error)
+);
 
-// ✅ RESPONSE INTERCEPTOR (🔥 IMPORTANT)
+// ==============================
+// ✅ RESPONSE INTERCEPTOR
+// ==============================
 API.interceptors.response.use(
   (res) => res,
   (error) => {
-    // 🔴 If token expired / unauthorized
-    if (error.response && error.response.status === 401) {
+    if (error.response) {
+      // 🔴 Unauthorized (token expired)
+      if (error.response.status === 401) {
+        console.log("Session expired. Logging out...");
 
-      console.log("Session expired. Logging out...");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
 
-      // clear storage
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
 
-      // redirect to login
-      window.location.href = "/login";
+      // 🔴 Not Found Debug
+      if (error.response.status === 404) {
+        console.error("❌ API Route Not Found:", error.config.url);
+      }
+    } else {
+      console.error("❌ Network Error:", error.message);
     }
 
     return Promise.reject(error);
