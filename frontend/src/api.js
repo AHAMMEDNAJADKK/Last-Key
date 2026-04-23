@@ -6,9 +6,9 @@ const API = axios.create({
   withCredentials: true, // optional (good for auth/cookies later)
 });
 
-// ==============================
+
 // ✅ REQUEST INTERCEPTOR
-// ==============================
+
 API.interceptors.request.use(
   (req) => {
     const token = localStorage.getItem("token");
