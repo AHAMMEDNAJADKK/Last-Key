@@ -1,48 +1,87 @@
 import { Navigate, useLocation } from "react-router-dom";
-import useVerification from "../hooks/useVerification";
 import { useAuth } from "../context/AuthContext";
 
-export default function ProtectedRoute({ children, roleRequired }) {
+// ─── Inline skeleton while verification status is loading ────────────────────
+function VerificationLoadingSkeleton() {
+  return (
+    <div
+      style={{
+        minHeight: "60vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 16,
+        padding: "40px 24px",
+      }}
+    >
+      <div
+        className="skeleton skeleton-block"
+        style={{ width: 64, height: 64, borderRadius: "50%" }}
+      />
+      <div className="skeleton skeleton-text" style={{ width: 220, height: 16 }} />
+      <div className="skeleton skeleton-text" style={{ width: 160, height: 12 }} />
+    </div>
+  );
+}
 
-  const { user, loading } = useAuth();
+// ─── ProtectedRoute ──────────────────────────────────────────────────────────
+// Props:
+//   roleRequired  — "user" | "nominee" | "admin"
+//   children      — the page component
+
+export default function ProtectedRoute({ children, roleRequired }) {
+  const { user, role, verificationStatus } = useAuth();
   const location = useLocation();
 
-  const status = useVerification(); // ✅ always called (safe)
+  // AuthProvider already handles the initial loading skeleton,
+  // so by the time we reach here, user data is resolved.
 
-  if (loading) {
-    return <p className="text-center mt-5">Loading...</p>;
-  }
-
-  // ❌ No user
+  // ── Not authenticated ─────────────────────────────────────────────────────
   if (!user) {
-    return <Navigate to="/login" />;
+    // Send to the appropriate login page based on intended role
+    if (roleRequired === "nominee") return <Navigate to="/nominee/login" replace />;
+    if (roleRequired === "admin")   return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // ❌ Wrong role
-  if (roleRequired && user.role !== roleRequired) {
-    return <Navigate to="/" />;
+  // ── Wrong role ────────────────────────────────────────────────────────────
+  if (roleRequired && role !== roleRequired) {
+    return <Navigate to="/" replace />;
   }
 
-  // 🔐 ONLY APPLY LOGIC FOR NOMINEE
-  if (user.role === "nominee") {
+  // ── Nominee verification flow ─────────────────────────────────────────────
+  if (role === "nominee") {
 
-    if (status === "loading") {
-      return <p className="text-center mt-5">Loading...</p>;
+    // Status not yet loaded from backend — show skeleton
+    if (verificationStatus === null) {
+      return <VerificationLoadingSkeleton />;
     }
 
-    if (status === "not_uploaded" && location.pathname !== "/nominee/upload-death-certificate") {
-      return <Navigate to="/nominee/upload-death-certificate" />;
+    const path = location.pathname;
+
+    if (
+      verificationStatus === "not_uploaded" &&
+      path !== "/nominee/upload-death-certificate"
+    ) {
+      return <Navigate to="/nominee/upload-death-certificate" replace />;
     }
 
-    if (status === "pending" && location.pathname !== "/nominee/pending") {
-      return <Navigate to="/nominee/pending" />;
+    if (
+      verificationStatus === "pending" &&
+      path !== "/nominee/pending"
+    ) {
+      return <Navigate to="/nominee/pending" replace />;
     }
 
-    if (status === "rejected" && location.pathname !== "/nominee/rejected") {
-      return <Navigate to="/nominee/rejected" />;
+    if (
+      verificationStatus === "rejected" &&
+      path !== "/nominee/rejected"
+    ) {
+      return <Navigate to="/nominee/rejected" replace />;
     }
 
-    // approved → allow
+    // "approved" → fall through and render children
   }
 
   return children;

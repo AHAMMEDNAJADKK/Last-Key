@@ -1,13 +1,273 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ============================================================
+   LASTKEY — GLOBAL DESIGN SYSTEM
+   ============================================================ */
+
+/* -- Google Font ------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* -- CSS Custom Properties --------------------------------- */
+:root {
+  /* Brand Colors */
+  --primary: #442d82;
+  --primary-light: #5a3da8;
+  --primary-dark: #2e1e5e;
+  --accent: #b7d333;
+  --accent-dark: #96af1f;
+  --accent-light: #d4f04a;
+
+  /* Neutrals */
+  --white: #ffffff;
+  --off-white: #f8f9ff;
+  --gray-100: #f1f3f9;
+  --gray-200: #e2e6f3;
+  --gray-400: #9099b7;
+  --gray-700: #3a3f5c;
+  --black: #0d0f1a;
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg-light: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px rgba(68, 45, 130, 0.18);
+
+  /* Navbar */
+  --navbar-h: 70px;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --t-fast: 0.15s ease;
+  --t-base: 0.25s ease;
+  --t-slow: 0.4s ease;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* -- Reset & Base ------------------------------------------ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--white);
+  color: var(--gray-700);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Offset for sticky navbar */
+main, #root > .page-wrapper {
+  padding-top: var(--navbar-h);
+}
+
+/* -- Typography -------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  color: var(--primary-dark);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+p { line-height: 1.7; }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* -- Glassmorphism ----------------------------------------- */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-light {
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border: 1px solid rgba(68, 45, 130, 0.12);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(68, 45, 130, 0.10);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 24px rgba(68, 45, 130, 0.10);
+  transition: transform var(--t-base), box-shadow var(--t-base);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(68, 45, 130, 0.18);
+}
+
+/* -- Buttons ----------------------------------------------- */
+.btn-primary-lk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--primary);
+  color: var(--white);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: background var(--t-base), transform var(--t-fast), box-shadow var(--t-base);
+  box-shadow: 0 4px 14px rgba(68, 45, 130, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary-lk:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(68, 45, 130, 0.45);
+}
+
+.btn-primary-lk:active {
+  transform: scale(0.97);
+}
+
+.btn-accent-lk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--accent);
+  color: var(--primary-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: background var(--t-base), transform var(--t-fast), box-shadow var(--t-base);
+  box-shadow: 0 4px 14px rgba(183, 211, 51, 0.4);
+}
+
+.btn-accent-lk:hover {
+  background: var(--accent-light);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(183, 211, 51, 0.55);
+}
+
+.btn-accent-lk:active {
+  transform: scale(0.97);
+}
+
+.btn-ghost-lk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 9px 20px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--primary);
+  cursor: pointer;
+  transition: all var(--t-base);
+}
+
+.btn-ghost-lk:hover {
+  background: var(--primary);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+/* -- Skeleton Loading -------------------------------------- */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--gray-100) 25%,
+    var(--gray-200) 50%,
+    var(--gray-100) 75%
+  );
+  background-size: 1200px 100%;
+  animation: skeleton-shimmer 1.4s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-navbar {
+  height: var(--navbar-h);
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.skeleton-text {
+  height: 14px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton-block {
+  border-radius: var(--radius-md);
+}
+
+/* -- Page Transition wrapper ------------------------------- */
+.page-transition {
+  width: 100%;
+  min-height: calc(100vh - var(--navbar-h));
+}
+
+/* -- Scroll Reveal base ------------------------------------ */
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+/* -- Utilities --------------------------------------------- */
+.text-accent   { color: var(--accent); }
+.text-primary  { color: var(--primary); }
+.bg-primary-lk { background-color: var(--primary); }
+.bg-accent-lk  { background-color: var(--accent); }
+
+.container-lk {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* -- Scrollbar --------------------------------------------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: var(--radius-full);
 }

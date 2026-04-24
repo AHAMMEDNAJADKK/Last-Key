@@ -23,7 +23,7 @@ export default function UploadDeathCertificate() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data } = await API.post(
+      await API.post(
         "/verification/upload",
         formData,
         {
