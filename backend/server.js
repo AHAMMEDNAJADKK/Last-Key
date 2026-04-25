@@ -1,6 +1,6 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 import morgan from "morgan";
 import helmet from "helmet";
@@ -13,8 +13,6 @@ import documentRoutes from "./routes/documentRoutes.js";
 import nomineeRoutes from "./routes/nomineeRoutes.js";
 import verificationRoutes from "./routes/verificationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-
-dotenv.config();
 
 const app = express();
 

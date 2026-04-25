@@ -4,39 +4,44 @@ import {
   getDocuments,
   deleteDocument,
 } from "../controllers/documentController.js";
-
 import { protect } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-// ─── Multer error wrapper ────────────────────────────────────────────────────
-// Multer throws errors (file too large, wrong type) OUTSIDE the controller's
-// try/catch. This wrapper converts multer errors into proper JSON 400 responses
-// instead of crashing with a 500.
-const handleUpload = (req, res, next) => {
+/**
+ * @desc  Custom middleware to handle multer errors before they hit the controller
+ */
+const uploadSingleFile = (req, res, next) => {
+  // Use field name "file"
   upload.single("file")(req, res, (err) => {
-    if (err) {
-      // MulterError (file size, unexpected field, etc.)
+    if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({ message: "File too large. Maximum size is 10MB." });
+        return res.status(400).json({ message: "File too large. Max 10MB allowed." });
       }
-      // fileFilter rejection or other multer error
-      return res.status(400).json({ message: err.message || "File upload error" });
+      return res.status(400).json({ message: `Multer error: ${err.message}` });
+    } else if (err) {
+      return res.status(400).json({ message: err.message });
     }
     next();
   });
 };
 
-// ─── Routes ──────────────────────────────────────────────────────────────────
+// Use simple "upload.single('file')" if we trust express global error handler,
+// but let's provide a robust version here.
 
-// POST /api/documents   — upload a new document
-router.post("/", protect, handleUpload, addDocument);
+import multer from "multer"; // Needed for instance check
 
-// GET /api/documents    — get all documents for logged-in user
+router.post("/", protect, (req, res, next) => {
+  upload.single("file")(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+    next();
+  });
+}, addDocument);
+
 router.get("/", protect, getDocuments);
-
-// DELETE /api/documents/:id  — delete a document by ID
 router.delete("/:id", protect, deleteDocument);
 
 export default router;

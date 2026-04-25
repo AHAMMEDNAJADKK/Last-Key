@@ -2,28 +2,30 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// ✅ Ensure uploads folder exists (use absolute path to avoid CWD issues)
+// ✅ Ensure uploads folder exists (use absolute path)
 const uploadDir = path.resolve(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// ✅ Disk storage — save temporarily before Cloudinary upload
+// ✅ Storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
-
   filename: (req, file, cb) => {
-    // Sanitize original name + timestamp to avoid collisions
-    const safeName = file.originalname.replace(/\s+/g, "-").replace(/[^a-zA-Z0-9.\-_]/g, "");
-    const fileName = `${Date.now()}-${safeName}`;
-    cb(null, fileName);
+    // Sanitize and append timestamp
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, ext).replace(/\s+/g, "-");
+    cb(null, `${baseName}-${uniqueSuffix}${ext}`);
   },
 });
 
-// ✅ Strict file filter — only safe document types
+// ✅ File filter
 const fileFilter = (req, file, cb) => {
+  console.log(`--- [MULTER] Checking file: ${file.originalname} (${file.mimetype}) ---`);
+  
   const allowedTypes = [
     "application/pdf",
     "image/jpeg",
@@ -35,15 +37,16 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    // Pass error as first arg — multer will NOT save file and triggers error handler
-    cb(new Error("Only PDF, JPG, PNG, WEBP files are allowed"), false);
+    console.warn(`❌ [MULTER] Rejected file type: ${file.mimetype}`);
+    cb(new Error(`File type '${file.mimetype}' not supported. Use PDF, JPG, PNG, or WEBP.`), false);
   }
 };
 
-// ✅ 10MB limit (Cloudinary free tier supports up to 10MB for images, 100MB for video)
+
+// ✅ Multer instance
 const upload = multer({
-  storage,
-  fileFilter,
+  storage: storage,
+  fileFilter: fileFilter,
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
   },

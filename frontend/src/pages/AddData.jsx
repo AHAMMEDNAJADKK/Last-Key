@@ -85,6 +85,7 @@ export default function AddData() {
     } catch (error) {
       const msg = error.response?.data?.message || "Upload failed. Please try again.";
       toast.error(msg, { id: toastId });
+      console.log("Upload error response data:", error.response?.data);
       console.error("Upload error:", error);
     } finally {
       setLoading(false);
